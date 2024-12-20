@@ -1,51 +1,38 @@
-
-
 <?php
-
 session_start();
 
+if (isset($_POST['submit_l'])) {
+    $userid = $_POST['id_l'];
+    $password = $_POST['pass_l'];
+  //  $storedname=$_SESSION['name_r'];
 
-if(isset($_POST['submit_l'])){ 
+    // Read user data from file
+    $users = file('users.txt', FILE_IGNORE_NEW_LINES);
 
-$username=trim($_POST['name_l']);
-$password=trim($_POST['pass_l']);
-$user_type=trim($_POST['user_type_r']);
+    foreach ($users as $user) {
+        list($id, $stored_password, $name, $user_type) = explode('|', $user);
 
-if($username == null || empty($password)){
-    echo "Null username/password";
-}
+        // Verify credentials
+        if ($userid === $id && $password === $stored_password) {
+            // Save user information in session
+          
+           $_SESSION['name']=$name;
+           $_SESSION['id']= $id;
 
-else if($_SESSION['id_r']==$username && $_SESSION['pass_r']==$password){
-
-  if(isset($_POST['user_type_r']) ){
-
-    if($user_type=='admin'){
-    header('location:admin_me.php');
+            // Redirect based on user type
+            if ($user_type === 'admin') {
+                header('Location: admin_me.php');
+                exit;
+            } else {
+                header('Location: user_me.php');
+                exit;
+            }
+        }
     }
-    else if($user_type=='user'){
-        header('location:user_me.php');
 
-    }
-
-}else{
-    echo 'Define User Type';
+    // If no match, show error
+    echo "Invalid username or password.";
+} else {
+    header('Location: login.php');
 }
-}
-
-
-else{
-
-    echo "Please submit correct information";
-}
-
-
-}
-
-else{
-
-    header('location:login.php');
-}
-
-
-
 ?>
